@@ -31,18 +31,18 @@ def show_all_pokemons(request):
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon_entity in pokemon_entities:
 
-        image_absolute_path = pokemon_entity.pokemon.get_absolute_path(request)
+        full_image_path = pokemon_entity.pokemon.get_full_image_path(request)
 
         add_pokemon(
             folium_map, pokemon_entity.lat, pokemon_entity.lon,
-            pokemon_entity.pokemon.title, image_absolute_path)
+            pokemon_entity.pokemon.title, full_image_path)
 
 
     pokemons_on_page = []
     for pokemon in pokemons:
         pokemons_on_page.append({
             'pokemon_id': pokemon.id,
-            'img_url': pokemon.get_image_url(),
+            'img_url': pokemon.image.url,
             'title_ru': pokemon.title,
         })
 
@@ -63,7 +63,7 @@ def show_pokemon(request, pokemon_id):
         "title_ru": requested_pokemon.title,
         "title_en": requested_pokemon.english_title,
         "title_jp": requested_pokemon.japanese_title,
-        "img_url": requested_pokemon.get_image_url(),
+        "img_url": requested_pokemon.image.url,
         "description": requested_pokemon.description,
     }
 
@@ -71,25 +71,25 @@ def show_pokemon(request, pokemon_id):
         pokemon_specification['previous_evolution'] = {
             "title_ru": requested_pokemon.previous_evolution.title,
             "pokemon_id": requested_pokemon.previous_evolution.id,
-            "img_url": requested_pokemon.previous_evolution.get_image_url()
+            "img_url": requested_pokemon.previous_evolution.image.url
         }
-
-    if requested_pokemon.evolutions.all():
+       
+    if requested_pokemon.evolutions.first():
         pokemon_specification['next_evolution'] = {
             "title_ru": requested_pokemon.evolutions.get().title,
             "pokemon_id": requested_pokemon.evolutions.get().id,
-            "img_url": requested_pokemon.evolutions.get().get_image_url()
+            "img_url": requested_pokemon.evolutions.get().image.url
         }
 
 
-    pokemon_entities = PokemonEntity.objects.filter(pokemon__id=pokemon_id)
+    pokemon_entities = requested_pokemon.pokemons.all()
 
     folium_map = folium.Map(location=MOSCOW_CENTER, zoom_start=12)
     for pokemon_entity in pokemon_entities:
-        image_absolute_path = pokemon_entity.pokemon.get_absolute_path(request)
+        full_image_path = pokemon_entity.pokemon.get_full_image_path(request)
         add_pokemon(
             folium_map, pokemon_entity.lat, pokemon_entity.lon,
-            pokemon_entity.pokemon.title, image_absolute_path)
+            pokemon_entity.pokemon.title, full_image_path)
 
     return render(request, "pokemon.html", context={'map': folium_map._repr_html_(),
                                                     'pokemon': pokemon_specification})

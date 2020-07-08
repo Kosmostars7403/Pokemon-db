@@ -18,21 +18,16 @@ class Pokemon(models.Model):
     def __str__(self):
         return self.title
 
-    def get_image_url(self):
-        if self.image:
-            image_url = os.path.join(settings.MEDIA_URL, self.image.name)
-            return image_url
-        else:
-            return None
 
-    def get_absolute_path(self, request):
-        image_url = self.get_image_url()
+    def get_full_image_path(self, request):
+        image_url = self.image.url
         image_absolute_path = request.build_absolute_uri(image_url)
         return image_absolute_path
 
 
 class PokemonEntity(models.Model):
-    pokemon = models.ForeignKey(Pokemon, verbose_name='Координаты покемона:', on_delete=models.CASCADE)
+    pokemon = models.ForeignKey(Pokemon, verbose_name='Координаты покемона:', on_delete=models.CASCADE,
+                                related_name='pokemons')
     lat = models.FloatField(verbose_name='Широта')
     lon = models.FloatField(verbose_name='Долгота')
     appeared_at = models.DateTimeField(verbose_name='Появляется', null=True, blank=True)
