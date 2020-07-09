@@ -15,19 +15,14 @@ class Pokemon(models.Model):
                                            verbose_name='Эвольционирует из', null=True, blank=True)
 
 
+
     def __str__(self):
         return self.title
 
 
-    def get_full_image_path(self, request):
-        image_url = self.image.url
-        image_absolute_path = request.build_absolute_uri(image_url)
-        return image_absolute_path
-
-
 class PokemonEntity(models.Model):
     pokemon = models.ForeignKey(Pokemon, verbose_name='Координаты покемона:', on_delete=models.CASCADE,
-                                related_name='pokemons')
+                                related_name='pokemon_entities')
     lat = models.FloatField(verbose_name='Широта')
     lon = models.FloatField(verbose_name='Долгота')
     appeared_at = models.DateTimeField(verbose_name='Появляется', null=True, blank=True)
